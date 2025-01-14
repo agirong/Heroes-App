@@ -11,6 +11,9 @@ export class ConfirmDialogComponent {
   readonly dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
   readonly data = inject<Hero>(MAT_DIALOG_DATA);
 
+  constructor(){
+  }
+
   onNoClick(): void {
     this.dialogRef.close(false);
   }
