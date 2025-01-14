@@ -4,6 +4,9 @@ import { Hero, Publisher } from '../../interfaces/hero.interface';
 import { HeroesService } from '../../services/hero.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-new-page',
@@ -31,6 +34,8 @@ export class NewPageComponent implements OnInit {
     private herosService:HeroesService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private snackbar: MatSnackBar,
+    private dialog: MatDialog,
   ){}
 
   ngOnInit(): void {
@@ -63,7 +68,7 @@ export class NewPageComponent implements OnInit {
     if(this.currenHero.id){
       this.herosService.updateHero(this.currenHero)
         .subscribe( hero =>{
-
+          this.showSnackBar(`${ hero.superhero } actualizado!`);
         })
       return;
     }
@@ -71,10 +76,30 @@ export class NewPageComponent implements OnInit {
     //Si no Crear...
     this.herosService.addHero(this.currenHero)
       .subscribe(hero=>{
-
+        this.router.navigate(['/heroes/edit', hero.id ]);
+        this.showSnackBar(`${ hero.superhero } creado!`);
       })
 
     //  this.herosService.updateHero(this.heroForm.value);
 
+  }
+
+  onDeleteHero(){
+    if(!this.currenHero.id) throw Error('Hero id es requerido')
+
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: this.heroForm.value
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+        console.log(result)
+      });
+  }
+
+  showSnackBar(message:string){
+    this.snackbar.open(message,'done',{
+      duration:2500
+    })
   }
 }
